@@ -3,41 +3,48 @@ from pathlib import Path
 
 import pandas as pd
 from airflow import DAG
-from airflow.operators.bash import BashOperator
-from airflow.operators.python import PythonOperator
-
-dag = DAG(
-    dag_id="04_time_delta",
-    schedule_interval=dt.timedelta(days=3),
-    start_date=dt.datetime(year=2019, month=1, day=1),
-    end_date=dt.datetime(year=2019, month=1, day=5),
-)
-
-fetch_events = BashOperator(
-    task_id="fetch_events",
-    bash_command=(
-        "mkdir -p /data/events && "
-        "curl -o /data/events.json http://events_api:5000/events"
-    ),
-    dag=dag,
-)
+from airflow.providers.standard.operators.bash import BashOperator
+from airflow.providers.standard.operators.python import PythonOperator
 
 
-def _calculate_stats(input_path, output_path):
+# Paths (local writable directories)
+EVENTS_PATH = "/tmp/events/events.json"
+STATS_PATH = "/tmp/stats/stats.csv"
+EVENTS_URL = "http://localhost:5003/events"
+
+
+def _calculate_stats(input_path: str, output_path: str):
     """Calculates event statistics."""
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
     events = pd.read_json(input_path)
-    stats = events.groupby(["date", "user"]).size().reset_index()
+    stats = events.groupby(["date", "user"]).size().reset_index(name="count")
 
-    Path(output_path).parent.mkdir(exist_ok=True)
     stats.to_csv(output_path, index=False)
 
 
-calculate_stats = PythonOperator(
-    task_id="calculate_stats",
-    python_callable=_calculate_stats,
-    op_kwargs={"input_path": "/data/events.json", "output_path": "/data/stats.csv"},
-    dag=dag,
-)
+with DAG(
+    dag_id="04_time_delta",
+    schedule=dt.timedelta(days=3), 
+    start_date=dt.datetime(2026, 2, 20),  
+    catchup=False,  
+) as dag:
 
-fetch_events >> calculate_stats
+    fetch_events = BashOperator(
+        task_id="fetch_events",
+        bash_command=(
+            f"mkdir -p {Path(EVENTS_PATH).parent} && "
+            f"curl -sf -o {EVENTS_PATH} {EVENTS_URL}"
+        ),
+    )
+
+    calculate_stats = PythonOperator(
+        task_id="calculate_stats",
+        python_callable=_calculate_stats,
+        op_kwargs={
+            "input_path": EVENTS_PATH,
+            "output_path": STATS_PATH,
+        },
+    )
+
+    fetch_events >> calculate_stats
