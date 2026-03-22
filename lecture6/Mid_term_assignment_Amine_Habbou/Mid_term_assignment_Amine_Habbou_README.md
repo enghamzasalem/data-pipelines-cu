@@ -1,7 +1,7 @@
 # Gold Price & War News ML Pipeline
 
 ## Project Overview
-ETL + ML pipeline that fetches gold prices (2024–present) and war-related news, trains a sentiment-based prediction model, and deploys it weekly using Apache Airflow.
+an automated ETL + ML pipeline that fetches gold prices (2024–present) and war-related news, trains a sentiment-based prediction model, and deploys it weekly using Apache Airflow.
 
 ## Methodology
 
@@ -13,9 +13,7 @@ ETL + ML pipeline that fetches gold prices (2024–present) and war-related news
 | **War News** | Multiple sources: RSS feeds (NYT, BBC, Guardian, Reuters, CNN, Al Jazeera, etc.) + Internet Archive TV News Archive (historical coverage 2024–2026) |
 
 ### 2. Pipeline Architecture
-fetch_gold_prices ──┐
-├── compute_sentiment_and_merge ── train_model
-fetch_war_news ─────┘
+[fetch gold prices] and [fetch war news] --> compute sentiment and merge --> train model
 
 ### 3. Data Processing
 
