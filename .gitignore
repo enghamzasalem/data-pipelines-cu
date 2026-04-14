@@ -5,3 +5,6 @@ lecture8/assignment
 !lecture7/assignment/docker/
 !lecture7/assignment/docker/main.tf
 !lecture7/assignment/docker/README.md
+!lecture7/assignment/aws/
+!lecture7/assignment/aws/main.tf
+!lecture7/assignment/aws/README.md

@@ -44,10 +44,10 @@ Each example folder has its own `README.md` with a short explanation and the com
 
 ## Assignment: Web Server + n8n
 
-The assignment for this lecture is to deploy a web server and `n8n`, making sure the dependencies start before `n8n`. The assignment can be done with Docker locally or with AWS.
+The assignment for this lecture is to deploy a web server and `n8n`, making sure the dependencies start before `n8n`. The AWS option is included in this project so the assignment can be completed without relying on local Docker.
 
-- `assignment/docker/`: Docker solution where the web server container starts before the `n8n` container using `depends_on`
-- `assignment/aws/`: AWS solution using one EC2 instance and a `user_data` script
+- `assignment/aws/`: AWS solution using one EC2 instance and a `user_data` script that installs Docker, starts the web server, and then starts `n8n`
+- `assignment/docker/`: Docker solution for local use if needed
 
 See `LECTURE7_ASSIGNMENT_README.md` for the assignment steps and submission requirements.
 
