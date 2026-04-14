@@ -1,45 +1,34 @@
-# Lecture 9: Nomad Assignment — Hello World
+# Lecture 9: Nomad Assignment - Hello World
 
-Run a **Nomad development cluster** and submit a **minimal batch job** that prints **`Hello, world from Nomad!`**.
+Run a Nomad development cluster and submit a minimal batch job that prints `Hello, world from Nomad!`.
 
 ## Objectives
 
-1. Install the **Nomad CLI** (≥ 1.5) and verify with `nomad -v`.
-2. Start a **local dev agent** (or use a cluster with `NOMAD_ADDR` set).
-3. Submit **`assignment/hello-world.nomad.hcl`** with `nomad job run`.
-4. Confirm the job **completed** and read the task output from **allocation logs**.
-5. Clean up with `nomad job stop -purge` (optional for batch; job may already be terminal).
+1. Install the Nomad CLI (>= 1.5) and verify with `nomad -v`.
+2. Start a local dev agent, or use a cluster with `NOMAD_ADDR` set.
+3. Submit a hello-world jobspec with `nomad job run`.
+4. Confirm the job completed and read the task output from allocation logs.
+5. Clean up with `nomad job stop -purge` if needed.
 
 ## Prerequisites
 
-- **Nomad** ≥ 1.5
-- **Docker** running (for **`hello-world.nomad.hcl`**)
-- **Linux-only, no Docker:** use **`hello-world-exec.nomad.hcl`** instead (`exec` + `/bin/echo`)
+- Nomad >= 1.5
+- Docker running for `assignment/hello-world.nomad.hcl`
+- Linux without Docker: use `assignment/hello-world-exec.nomad.hcl`
+- Windows without Docker: use `assignment/hello-world-windows.nomad.hcl`
 
 ## Steps
 
 ### 1. Start the dev agent
 
-**macOS + Docker Desktop:** `nomad agent -dev` stores allocations under **`/private/tmp/NomadClient…`**. Docker often **cannot** create bind mounts there → **`permission denied`** / `host_mnt/private/tmp/NomadClient`. **`sudo` alone does not fix this**; you must set **`-data-dir`** to a folder under **`/Users/you/...`** (Docker shares `/Users` by default).
-
-**Easiest (from `lecture9/`):**
+macOS with Docker Desktop:
 
 ```bash
 chmod +x nomad-dev-macos.sh
 ./nomad-dev-macos.sh
 ```
 
-**Same thing manually** (`$HOME` expands *before* `sudo`, so the path stays under your home):
-
-```bash
-mkdir -p "$HOME/nomad-dev-data"
-sudo nomad agent -dev \
-  -data-dir="$HOME/nomad-dev-data" \
-  -bind 0.0.0.0 \
-  -network-interface='{{ GetDefaultInterfaces | attr "name" }}'
-```
-
-**Linux:** plain dev agent is usually fine:
+Linux:
 
 ```bash
 sudo nomad agent -dev \
@@ -47,31 +36,54 @@ sudo nomad agent -dev \
   -network-interface='{{ GetDefaultInterfaces | attr "name" }}'
 ```
 
-Terminal B:
+Windows without Docker:
+
+```powershell
+nomad agent -dev -bind 127.0.0.1 -data-dir="$PWD/.nomad-dev-data" -config=nomad-dev-windows.hcl
+```
+
+In a second terminal:
 
 ```bash
 export NOMAD_ADDR=http://localhost:4646
 nomad node status
 ```
 
+PowerShell equivalent:
+
+```powershell
+$env:NOMAD_ADDR = "http://127.0.0.1:4646"
+nomad node status
+```
+
 ### 2. Run the job
+
+Default Docker path:
 
 ```bash
 cd lecture9
 nomad job run assignment/hello-world.nomad.hcl
 ```
 
-### 3. See “Hello, world”
+No-Docker alternatives:
+
+- Linux: `nomad job run assignment/hello-world-exec.nomad.hcl`
+- Windows: `nomad job run assignment/hello-world-windows.nomad.hcl`
+
+### 3. See the output
 
 ```bash
 nomad job status hello-world
-# Note the Allocation ID from the job status, then:
 nomad alloc logs <allocation-id> hello
 ```
 
-You should see: **`Hello, world from Nomad!`**
+You should see:
 
-You can also open **http://localhost:4646/ui** → job **hello-world** → allocation → **Logs**.
+```text
+Hello, world from Nomad!
+```
+
+You can also open [http://127.0.0.1:4646/ui](http://127.0.0.1:4646/ui) and inspect the `hello-world` job there.
 
 ### 4. Clean up
 
@@ -79,68 +91,41 @@ You can also open **http://localhost:4646/ui** → job **hello-world** → alloc
 nomad job stop -purge hello-world
 ```
 
-Stop the dev agent with **Ctrl+C** in the first terminal.
+Stop the dev agent with `Ctrl+C` in the first terminal.
 
-## Troubleshooting: `Resources exhausted` / `Dimension "cpu" exhausted`
+## Troubleshooting
 
-The dev client only has so much **allocatable** CPU. Other jobs (Ollama, Open WebUI, nginx, Pytechco, etc.) can use it all — even **100 MHz** may not fit.
+### `Dimension "cpu" exhausted`
 
-1. **List and purge everything** (repeat until `nomad job status` is empty or only shows stopped jobs):
+1. Run `nomad job status`
+2. Purge any old jobs with `nomad job stop -purge <job-id>`
+3. Run `nomad system gc`
+4. Restart the dev agent
 
-   ```bash
-   nomad job status
-   nomad job stop -purge <each-running-job-id>
-   ```
+### `Constraint "missing drivers"` on macOS
 
-2. **Garbage-collect** old allocations:
+Use `hello-world.nomad.hcl` with Docker. Do not use `hello-world-exec.nomad.hcl` on macOS.
 
-   ```bash
-   nomad system gc
-   ```
+### Windows without Docker
 
-3. **Restart the dev agent** (Ctrl+C, then start `nomad agent -dev ...` again).
-
-4. Run **`hello-world`** again. The jobspec uses **`cpu = 1`** (Nomad minimum MHz) and **`memory = 64`**.
-
-If it **still** fails, check how much CPU the node exposes:
-
-```bash
-nomad node status -verbose
-```
-
-Look for **CPU** / resources on your client — if another process outside Nomad is pinning the machine, close it or reboot.
-
-### `Constraint "missing drivers"` / `exec` on macOS
-
-Use **`hello-world.nomad.hcl`** (Docker + busybox). Do **not** use **`hello-world-exec.nomad.hcl`** on macOS — the **`exec`** driver is **Linux-only**.
-
-### Docker: `permission denied` / `host_mnt/private/tmp/NomadClient` (macOS)
-
-Default **`-dev`** uses **`/private/tmp`**. Docker Desktop cannot reliably **`mkdir`** there for mounts. **Use `-data-dir` under your home** (see step 1): run **`./nomad-dev-macos.sh`** or **`sudo nomad agent -dev -data-dir="$HOME/nomad-dev-data" ...`**.
-
-Then **`nomad job stop -purge hello-world`**, restart the agent with the new flags, and run the job again.
-
-In Docker Desktop → **Settings → Resources → File sharing**, ensure **`/Users`** is allowed (default on recent versions).
-
-You can still run **`nomad job run`** as your normal user.
+Use `nomad-dev-windows.hcl` to enable `raw_exec`, then run `assignment/hello-world-windows.nomad.hcl`.
 
 ## How to Submit
 
-1. **Screenshot** of **Nomad UI** showing job **hello-world** completed (or terminal showing `nomad alloc logs` with the hello line).
-2. **Pull Request** with the screenshot (and your jobspec if you changed it).
+1. A screenshot of the Nomad UI showing the `hello-world` job completed, or a terminal screenshot showing `nomad alloc logs` with the hello line.
+2. A pull request with the screenshot and your jobspec if you changed it.
 
 ### PR title example
 
-```
+```text
 Lecture 9: Nomad hello-world - [Your Name]
 ```
 
-## Extension (optional)
+## Optional extension
 
-- **`assignment/nginx-web.nomad.hcl`** — Docker **nginx** service on port **8080** (like Lecture 6); requires **Docker**.
-- Official **Pytechco** tutorial: [learn-nomad-getting-started](https://github.com/hashicorp-education/learn-nomad-getting-started) (`v1.1` tag).
+- `assignment/nginx-web.nomad.hcl`
+- `assignment/simple-html-web.nomad.hcl`
 
 ## Reference
 
 - [Nomad Quick Start](https://developer.hashicorp.com/nomad/tutorials/get-started)
-- Lecture 6–7: Terraform + Docker
