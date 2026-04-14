@@ -52,17 +52,20 @@ def test_model(model_path: Path, data_dir: Path) -> dict:
 
 
 def main():
+    default_data_dir = Path(__file__).resolve().parent / "data" / "gold_war_pipeline"
+    default_model_path = Path(__file__).resolve().parent / "models" / "gold_model.pkl"
+
     parser = argparse.ArgumentParser(description="Test gold price prediction model")
     parser.add_argument(
         "--model",
         type=Path,
-        default=Path("models/gold_model.pkl"),
+        default=default_model_path,
         help="Path to saved model .pkl",
     )
     parser.add_argument(
         "--data",
         type=Path,
-        default=Path("/data/gold_war_pipeline"),
+        default=default_data_dir,
         help="Data directory containing training_data.csv",
     )
     args = parser.parse_args()
