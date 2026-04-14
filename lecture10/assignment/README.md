@@ -2,14 +2,20 @@
 
 | File | Purpose |
 |------|---------|
-| **`ollama.nomad.hcl`** | Ollama + `poststart` model pull (`tinyllama` by default) |
-| **`open-webui.nomad.hcl`** | Optional UI; requires **`ollama`** job running first |
+| `ollama.nomad.hcl` | Docker-based Ollama job with a poststart model pull |
+| `ollama-windows.nomad.hcl` | Windows no-Docker Ollama job using `raw_exec` |
+| `open-webui.nomad.hcl` | Optional UI that depends on Ollama |
+
+Basic Nomad command:
 
 ```bash
-export NOMAD_ADDR=http://localhost:4646
 nomad job run assignment/ollama.nomad.hcl
-# wait for healthy; then optionally:
-nomad job run assignment/open-webui.nomad.hcl
 ```
 
-See **../LECTURE10_ASSIGNMENT_README.md**.
+Windows alternative:
+
+```powershell
+nomad job run assignment/ollama-windows.nomad.hcl
+```
+
+See `../LECTURE10_ASSIGNMENT_README.md` for the full assignment workflow.

@@ -1,36 +1,24 @@
-# Lecture 10: Nomad + Ollama (AI Workloads)
+# Lecture 10: Nomad + Ollama
 
-**Theme:** Run **private LLM** workloads on **HashiCorp Nomad** using **Ollama** (and optionally **Open WebUI**), following the official **AI workloads** tutorial track.
+Theme: run a private local LLM workload on Nomad using Ollama, with the same service plus poststart model-pull idea used in the official AI workloads tutorial.
 
-## Slides (Marp)
+## Assignment
 
-```bash
-cd lecture10
-npx @marp-team/marp-cli slides.md -o slides.html --no-stdin
-```
+Available jobspecs:
 
-Or `npm install` and `npm run slides`.
+- `assignment/ollama.nomad.hcl` for Docker
+- `assignment/ollama-windows.nomad.hcl` for Windows without Docker
+- `assignment/open-webui.nomad.hcl` for the optional bonus UI
 
-## Official tutorials (source)
-
-- [AI workloads on Nomad – Overview](https://developer.hashicorp.com/nomad/tutorials/ai-workloads/ai-workloads-overview)
-- [Configure a Granite AI workload](https://developer.hashicorp.com/nomad/tutorials/ai-workloads/configure-granite-workload)
-- [Run a Granite AI workload](https://developer.hashicorp.com/nomad/tutorials/ai-workloads/run-granite-workload)
-- [Scale node pools](https://developer.hashicorp.com/nomad/tutorials/ai-workloads/scale-node-pools)
-
-Companion jobspecs (full Granite + S3 + node pools): HashiCorp **learn-nomad-ai** style repos linked from those pages.
-
-## Assignment (simplified)
-
-Course versions in **`assignment/`** — smaller defaults for local dev. See **`LECTURE10_ASSIGNMENT_README.md`**.
+See `LECTURE10_ASSIGNMENT_README.md` for the submission steps.
 
 ## Prerequisites
 
-- **Nomad** ≥ 1.5, **Docker**
-- **RAM:** 4GB+ minimum for tiny models; **8GB+** recommended; Granite-class models need more (see Ollama docs)
-- **`curl`** on the Nomad client (for the `exec` poststart pull task)
+- Nomad >= 1.5
+- Docker for the Docker path
+- On Windows without Docker, use `nomad-dev-windows.hcl` and the Windows jobspec
 
-## Related lectures
+## Reference
 
-- **Lecture 8:** Terraform (S3, RDS — same ideas as tutorial `nomadVar` + S3 for Open WebUI)
-- **Lecture 9:** Nomad basics, `hello-world` batch job; optional nginx service
+- [AI workloads on Nomad - Overview](https://developer.hashicorp.com/nomad/tutorials/ai-workloads/ai-workloads-overview)
+- [Ollama API](https://github.com/ollama/ollama/blob/main/docs/api.md)

@@ -1,96 +1,62 @@
 # Lecture 10: Nomad + Ollama Assignment
 
-Run **Ollama** on Nomad and **pull a small LLM** using the same patterns as the HashiCorp **AI workloads** tutorial (`poststart` task + `nomadService` + `/api/pull`).
+Run Ollama on Nomad and pull a small model using the same Nomad pattern as the AI workloads tutorial: a service task plus a poststart task that calls `/api/pull`.
 
 ## Objectives
 
-1. Start a **Nomad dev cluster** (same as Lecture 9) with Docker available.
-2. Submit **`assignment/ollama.nomad.hcl`**.
-3. Verify the model pull (see logs / Ollama API) and optionally call **`http://<host>:11434/api/tags`** to list models.
-4. **Optional (bonus):** Submit **`assignment/open-webui.nomad.hcl`** *after* Ollama is healthy, open the UI, and send a chat prompt.
-5. Clean up: `nomad job stop -purge` for each job; stop the dev agent.
+1. Start a Nomad dev cluster.
+2. Submit the Ollama job.
+3. Verify the model pull.
+4. Call `http://localhost:11434/api/tags` to show the installed model.
+5. Optional bonus: run Open WebUI after Ollama is healthy.
 
 ## Prerequisites
 
-- Nomad CLI, Docker, enough **RAM** (see below).
-- **`curl`** installed on the machine running the Nomad **client** (used by the `exec` poststart task).
+- Nomad CLI
+- Enough RAM for a small local model
+- On Windows without Docker, use `assignment/ollama-windows.nomad.hcl`
+- If Docker is available, you may still use `assignment/ollama.nomad.hcl`
 
-## CPU exhaustion (`Dimension "cpu" exhausted`)
+## Recommended path on this laptop
 
-The **ollama** job has **two tasks** in one group (Ollama + `pull-model`); Nomad counts **both** toward the node until the poststart task finishes. **Open WebUI** adds more CPU. On a laptop dev agent, run **only ollama** first, or lower `resources.cpu` in the jobspecs. Stop other jobs: `nomad job stop -purge open-webui` then `ollama` if you need a clean node.
+Windows without Docker:
 
-## RAM notes
-
-- Default model in `ollama.nomad.hcl` is **`tinyllama`** — smallest practical demo.
-- To match the HashiCorp tutorial, change the pull to **`granite3.3:2b`** (requires substantially more memory).
-- If `pull-model` fails, check the allocation logs: `nomad alloc logs <alloc-id> pull-model`.
-
-## Steps
-
-### 1. Dev agent + CLI
-
-Terminal A:
-
-```bash
-sudo nomad agent -dev \
-  -bind 0.0.0.0 \
-  -network-interface='{{ GetDefaultInterfaces | attr "name" }}'
+```powershell
+nomad agent -dev -bind 127.0.0.1 -data-dir="$PWD/.nomad-dev-data" -config=nomad-dev-windows.hcl
 ```
 
-Terminal B:
+In another terminal:
 
-```bash
-export NOMAD_ADDR=http://localhost:4646
-nomad node status
+```powershell
+$env:NOMAD_ADDR = "http://127.0.0.1:4646"
+nomad job run assignment/ollama-windows.nomad.hcl
 ```
 
-### 2. Run Ollama job
+## Verify the model
 
-From the repo:
+Wait for the `pull-model` task to finish, then run:
 
-```bash
-cd lecture10
-nomad job run assignment/ollama.nomad.hcl
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:11434/api/tags"
 ```
 
-Wait for the **`pull-model`** task to finish (poststart). Then test (adjust host if not localhost):
+## Optional bonus
 
-```bash
-curl -s http://localhost:11434/api/tags | head
-```
-
-### 3. Optional: Open WebUI
-
-After **`ollama`** is running:
+If Docker is available and the machine has enough RAM, run:
 
 ```bash
 nomad job run assignment/open-webui.nomad.hcl
 ```
 
-Open **`http://localhost:3000`** (or the mapped static port in the jobspec). Create a local account if prompted (signup enabled for lab).
-
-### 4. Clean up
-
-```bash
-nomad job stop -purge open-webui
-nomad job stop -purge ollama
-```
-
 ## How to submit
 
-1. Screenshot of **Nomad UI** showing job **`ollama`** (and optionally **`open-webui`**) running.
-2. Screenshot of **`api/tags`** output in terminal **or** Open WebUI chat (if you did the bonus).
-3. Short note: link to **Lecture 8** (Terraform + cloud capacity) or **Lecture 9** (Nomad services).
-4. Pull request with screenshots; note any jobspec changes (e.g. model name, resources).
+1. Screenshot of Nomad UI showing job `ollama` running.
+2. Screenshot of `api/tags` output in the terminal.
+3. Short note linking the work back to Lecture 8 or Lecture 9.
+4. Pull request with screenshots and any jobspec changes.
 
 ### PR title example
 
-```
+```text
 Lecture 10: Nomad + Ollama - [Your Name]
 ```
-
-## Reference
-
-- [AI workloads on Nomad – Overview](https://developer.hashicorp.com/nomad/tutorials/ai-workloads/ai-workloads-overview)
-- [Ollama API](https://github.com/ollama/ollama/blob/main/docs/api.md)
-- Lecture 9: Nomad introduction + `hello-world` job (optional nginx)
