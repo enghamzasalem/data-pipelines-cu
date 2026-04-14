@@ -1,3 +1,7 @@
 data-pipelines-with-apache-airflow/
 lecture7/assignment
 lecture8/assignment
+!lecture7/assignment/
+!lecture7/assignment/docker/
+!lecture7/assignment/docker/main.tf
+!lecture7/assignment/docker/README.md
