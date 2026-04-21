@@ -1,0 +1,8 @@
+cat > ~/airflow/data/training_data.csv << EOL
+date,close,sentiment_mean,news_count,target
+2024-01-02,1955,0.1,1,1
+2024-01-03,1960,0.05,1,1
+2024-01-04,1965,-0.1,1,1
+2024-01-05,1970,-0.05,1,1
+2024-01-06,1975,0.0,1,0
+EOL
