@@ -31,7 +31,7 @@ job "ollama" {
 
       # Lower CPU helps single-node dev agents; raise for production / larger models.
       resources {
-        cpu    = 1500
+        cpu    = 100
         memory = 4096
       }
     }
