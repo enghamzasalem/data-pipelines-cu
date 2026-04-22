@@ -1,0 +1,8 @@
+cat > ~/airflow/data/war_news.csv << EOL
+date,title,summary
+2024-01-02,Conflict in Region X,Military forces clash in region X causing tension
+2024-01-03,Attack on City Y,City Y experiences attacks due to ongoing conflict
+2024-01-04,Invasion of Z,Country Z sees invasion by neighboring forces
+2024-01-05,War escalates,Conflict intensifies and casualties reported
+2024-01-06,Military action,New military action affects region X
+EOL

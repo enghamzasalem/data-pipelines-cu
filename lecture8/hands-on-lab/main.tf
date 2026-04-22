@@ -1,6 +1,4 @@
 # Lecture 8 Hands-on Lab: Baseline Infrastructure for Data Pipelines
-# Deploys S3 buckets (raw, staged, curated) and optionally a database.
-# Uses for_each and modules concepts from Chapters 4-5.
 
 terraform {
   required_version = ">= 1.0.0"
@@ -18,39 +16,19 @@ provider "aws" {
 }
 
 # -----------------------------------------------------------------------------
-# S3 Buckets for data pipeline stages (raw, staged, curated)
+# S3 MODULE (refactored)
 # -----------------------------------------------------------------------------
 
-resource "aws_s3_bucket" "pipeline" {
-  for_each = toset(var.bucket_suffixes)
+module "s3" {
+  source = "./modules/s3"
 
-  bucket = "${var.project}-${var.env}-${each.key}"
-}
-
-resource "aws_s3_bucket_versioning" "pipeline" {
-  for_each = aws_s3_bucket.pipeline
-
-  bucket = each.value.id
-
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "pipeline" {
-  for_each = aws_s3_bucket.pipeline
-
-  bucket = each.value.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
+  project         = var.project
+  env             = var.env
+  bucket_suffixes = var.bucket_suffixes
 }
 
 # -----------------------------------------------------------------------------
-# RDS PostgreSQL (optional - set create_database = true to enable)
+# RDS PostgreSQL (unchanged)
 # -----------------------------------------------------------------------------
 
 data "aws_vpc" "default" {
