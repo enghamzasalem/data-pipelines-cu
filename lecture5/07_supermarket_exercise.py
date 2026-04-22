@@ -11,6 +11,7 @@ Pipeline: wait_for_supermarket_1 → process_supermarket → add_to_db
 
 import airflow.utils.dates
 from airflow import DAG
+from datetime import datetime, timezone
 
 try:
     from airflow.sensors.filesystem import FileSensor
@@ -60,17 +61,52 @@ def _process_supermarket(**context):
             writer.writerow([prod, count, context["ds"]])
 
     print(f"Saved to {output_path}: {len(promotions)} products")
-    return output_path
+    return str(output_path)
 
 
 def _add_to_db(**context):
-    """Add promotions to database. Implement this task."""
-    pass
+    import sqlite3
+    import csv
+    from pathlib import Path
+
+    ds = context["ds"]
+    input_path = Path(f"/data/supermarket1/processed/promotions_{ds}.csv")
+    db_path = "/data/supermarket1/supermarket.db"
+
+    Path(db_path).parent.mkdir(parents=True, exist_ok=True)
+
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS promotions (
+            product_id TEXT,
+            promotion_count INTEGER,
+            date TEXT
+        )
+    """)
+
+    with open(input_path, "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            cursor.execute("""
+                INSERT INTO promotions (product_id, promotion_count, date)
+                VALUES (?, ?, ?)
+            """, (
+                row["product_id"],
+                int(row["promotion_count"]),
+                row["date"]
+            ))
+
+    conn.commit()
+    conn.close()
+
+    print(f"Inserted data into DB: {db_path}")
 
 
 dag = DAG(
     dag_id="lecture5_supermarket_exercise",
-    start_date=airflow.utils.dates.days_ago(3),
+    start_date=datetime(2024, 1, 1, tzinfo=timezone.utc),
     schedule="0 16 * * *",
     catchup=False,
     tags=["lecture5", "exercise", "supermarket", "filesensor"],
@@ -81,6 +117,7 @@ wait_for_supermarket_1 = FileSensor(
     task_id="wait_for_supermarket_1",
     filepath=f"{DATA_DIR}/_SUCCESS",
     poke_interval=60,
+    fs_conn_id="fs_default",
     timeout=60 * 60 * 24,
     mode="reschedule",
     dag=dag,
