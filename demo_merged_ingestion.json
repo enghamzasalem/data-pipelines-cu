@@ -1,0 +1,65 @@
+[
+  {
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "age": 30
+  },
+  {
+    "id": 2,
+    "name": "Jane Smith",
+    "email": "jane@example.com",
+    "age": 25
+  },
+  {
+    "id": 3,
+    "name": "Bob Johnson",
+    "email": "bob@example.com",
+    "age": 35
+  },
+  {
+    "id": 1,
+    "product_id": "P001",
+    "product_name": "Laptop",
+    "price": 999.99,
+    "stock": 50
+  },
+  {
+    "id": 2,
+    "product_id": "P002",
+    "product_name": "Mouse",
+    "price": 29.99,
+    "stock": 200
+  },
+  {
+    "id": 3,
+    "product_id": "P003",
+    "product_name": "Keyboard",
+    "price": 79.99,
+    "stock": 150
+  },
+  {
+    "id": 1,
+    "user": "api_user_1",
+    "status": "active",
+    "created": "2024-01-01"
+  },
+  {
+    "id": 2,
+    "user": "api_user_2",
+    "status": "active",
+    "created": "2024-01-02"
+  },
+  {
+    "id": 1,
+    "username": "db_user_1",
+    "role": "admin",
+    "last_login": "2024-01-15"
+  },
+  {
+    "id": 2,
+    "username": "db_user_2",
+    "role": "user",
+    "last_login": "2024-01-14"
+  }
+]

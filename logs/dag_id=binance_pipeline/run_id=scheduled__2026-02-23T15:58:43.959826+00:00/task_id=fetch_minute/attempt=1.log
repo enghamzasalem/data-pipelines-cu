@@ -1,0 +1,4 @@
+{"timestamp":"2026-02-23T15:58:44.354543","level":"info","event":"DAG bundles loaded: dags-folder","logger":"airflow.dag_processing.bundles.manager.DagBundlesManager"}
+{"timestamp":"2026-02-23T15:58:44.355422","level":"info","event":"Filling up the DagBag from /home/mimou/airflow/dags/Binance_combined.py","logger":"airflow.models.dagbag.DagBag"}
+{"timestamp":"2026-02-23T15:58:44.947630Z","level":"info","event":"Minute data saved at 2026-02-23 16:58:44","chan":"stdout","logger":"task"}
+{"timestamp":"2026-02-23T15:58:44.948479","level":"info","event":"Done. Returned value was: None","logger":"airflow.task.operators.airflow.providers.standard.operators.python.PythonOperator"}
