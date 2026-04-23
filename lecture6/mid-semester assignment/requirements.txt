@@ -1,0 +1,7 @@
+apache-airflow
+pandas
+yfinance
+feedparser
+textblob
+scikit-learn
+joblib
