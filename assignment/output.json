@@ -1,0 +1,16 @@
+[
+  {
+    "temperature_c": 13.2,
+    "windspeed_kmh": 14.0,
+    "weather_code": 0,
+    "conditions_short": "Clear",
+    "recorded_at": "2026-04-21T13:23:48.612823"
+  },
+  {
+    "temperature_c": 13.2,
+    "windspeed_kmh": 14.0,
+    "weather_code": 0,
+    "conditions_short": "Clear",
+    "recorded_at": "2026-04-21T13:24:12.907505"
+  }
+]

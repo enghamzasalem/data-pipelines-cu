@@ -1,0 +1,23 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-22.04-arm64"
+  
+config.vm.provider "parallels" do |prl|
+  prl.memory = 4096
+  prl.cpus = 2
+end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt update
+    sudo apt install -y openjdk-11-jdk python3-pip wget curl
+
+    # Install Spark
+    wget https://downloads.apache.org/spark/spark-3.5.1/spark-3.5.1-bin-hadoop3.tgz
+    tar -xzf spark-3.5.1-bin-hadoop3.tgz
+    sudo mv spark-3.5.1-bin-hadoop3 /opt/spark
+
+    echo 'export PATH=/opt/spark/bin:$PATH' >> /home/vagrant/.bashrc
+    source /home/vagrant/.bashrc
+
+    pip3 install -r /vagrant/requirements.txt
+  SHELL
+end
