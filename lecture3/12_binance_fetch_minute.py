@@ -1,106 +1,113 @@
 """
-Binance Price Fetcher - Minute Level
-=====================================
+Binance Price Fetcher - Minute Level (Airflow 3 Compatible)
+===========================================================
 
-This DAG fetches Bitcoin (BTCUSDT) average price from Binance API every minute
-and saves the raw data to CSV files.
+Fetches Bitcoin (BTCUSDT) average price from Binance API every minute
+and stores raw minute-level data partitioned by date.
 
-The data is saved with timestamps so it can be aggregated later by hourly and daily DAGs.
+Storage location:
+~/airflow/data/binance/raw/YYYY-MM-DD/
 
-Schedule: Runs every minute
-Start Date: Can be set to run for multiple days
+Airflow 3 compatible:
+- Uses `schedule`
+- Uses `logical_date`
 """
 
 from datetime import datetime, timedelta
 from pathlib import Path
+import os
 
 import requests
-
 import pandas as pd
+
 from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.providers.standard.operators.python import PythonOperator
 
 
-def _fetch_binance_price(**context):
+def fetch_binance_price(**context):
     """
-    Fetches Bitcoin price from Binance API and saves to CSV.
-    
-    API Response format:
-    {
-        "mins": 5,
-        "price": "68285.81006621",
-        "closeTime": 1771317380403
-    }
+    Fetch Bitcoin average price from Binance API
+    and store minute-level raw data.
     """
+
     api_url = "https://api.binance.com/api/v3/avgPrice?symbol=BTCUSDT"
-    
+
     try:
-        # Fetch data from Binance API
+        # Use Airflow logical execution time (IMPORTANT)
+        logical_time = context["logical_date"]
+
+        # Fetch API data
         response = requests.get(api_url, timeout=10)
         response.raise_for_status()
         data = response.json()
-        
-        # Add timestamp
-        data['timestamp'] = datetime.now().isoformat()
-        data['fetch_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        
-        # Convert price to float for easier processing
-        data['price_float'] = float(data['price'])
-        
-        # Create DataFrame
+
+        # Enrich with metadata
+        data["timestamp"] = logical_time.isoformat()
+        data["fetch_time"] = logical_time.strftime("%Y-%m-%d %H:%M:%S")
+        data["price_float"] = float(data["price"])
+
+        # Convert to DataFrame
         df = pd.DataFrame([data])
-        
-        # Save to CSV with date partitioning
-        date_str = datetime.now().strftime('%Y-%m-%d')
-        hour_str = datetime.now().strftime('%H')
-        minute_str = datetime.now().strftime('%M')
-        
-        output_dir = Path(f"/data/binance/raw/{date_str}")
+
+        # Date partitions using logical time
+        date_str = logical_time.strftime("%Y-%m-%d")
+        hour_str = logical_time.strftime("%H")
+        minute_str = logical_time.strftime("%M")
+
+        # Use AIRFLOW_HOME safely
+        airflow_home = Path(
+            os.environ.get("AIRFLOW_HOME", "~/airflow")
+        ).expanduser()
+
+        output_dir = airflow_home / "data" / "binance" / "raw" / date_str
         output_dir.mkdir(parents=True, exist_ok=True)
-        
-        # Save individual minute data
-        output_file = output_dir / f"price_{hour_str}_{minute_str}.csv"
-        df.to_csv(output_file, index=False)
-        
-        # Also append to daily file for easier aggregation
+
+        # Minute-level file
+        minute_file = output_dir / f"price_{hour_str}_{minute_str}.csv"
+        df.to_csv(minute_file, index=False)
+
+        # Append to daily file
         daily_file = output_dir / "daily_raw.csv"
+
         if daily_file.exists():
             existing_df = pd.read_csv(daily_file)
             df = pd.concat([existing_df, df], ignore_index=True)
-        
+
         df.to_csv(daily_file, index=False)
-        
-        print(f"Successfully fetched price: {data['price']} at {data['fetch_time']}")
-        print(f"Saved to: {output_file}")
-        
+
+        print(f"✅ Price fetched: {data['price']}")
+        print(f"📁 Saved to: {minute_file}")
+
         return data
-        
+
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching from Binance API: {e}")
+        print(f"❌ API request failed: {e}")
         raise
+
     except Exception as e:
-        print(f"Error processing data: {e}")
+        print(f"❌ Processing error: {e}")
         raise
 
 
-# DAG Definition
+# DAG Definition (Airflow 3)
 dag = DAG(
     dag_id="binance_fetch_minute",
-    description="Fetches Bitcoin price from Binance every minute",
-    schedule=timedelta(minutes=1),  # Run every minute
-    start_date=datetime(2024, 1, 1),  # Start date - can run for multiple days
-    catchup=False,  # Don't backfill - only run from now onwards
-    tags=["binance", "crypto", "price", "minute"],
+    description="Fetch Bitcoin price from Binance every minute",
+    schedule=timedelta(minutes=1),
+    start_date=datetime(2024, 1, 1),
+    catchup=False,
+    tags=["binance", "crypto", "minute"],
     default_args={
-        'retries': 3,
-        'retry_delay': timedelta(minutes=1),
+        "retries": 3,
+        "retry_delay": timedelta(minutes=1),
     },
 )
 
-# Task: Fetch price
+
+# Task
 fetch_price = PythonOperator(
     task_id="fetch_binance_price",
-    python_callable=_fetch_binance_price,
+    python_callable=fetch_binance_price,
     dag=dag,
 )
 

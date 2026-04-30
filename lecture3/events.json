@@ -1,0 +1,578 @@
+[
+  {
+    "date": "2019-01-01",
+    "event_type": "purchase",
+    "user": "bob",
+    "value": 21
+  },
+  {
+    "date": "2019-01-01",
+    "event_type": "click",
+    "user": "charlie",
+    "value": 94
+  },
+  {
+    "date": "2019-01-01",
+    "event_type": "login",
+    "user": "bob",
+    "value": 60
+  },
+  {
+    "date": "2019-01-01",
+    "event_type": "login",
+    "user": "bob",
+    "value": 82
+  },
+  {
+    "date": "2019-01-01",
+    "event_type": "view",
+    "user": "charlie",
+    "value": 56
+  },
+  {
+    "date": "2019-01-01",
+    "event_type": "login",
+    "user": "eve",
+    "value": 12
+  },
+  {
+    "date": "2019-01-01",
+    "event_type": "click",
+    "user": "eve",
+    "value": 74
+  },
+  {
+    "date": "2019-01-01",
+    "event_type": "purchase",
+    "user": "diana",
+    "value": 85
+  },
+  {
+    "date": "2019-01-01",
+    "event_type": "click",
+    "user": "bob",
+    "value": 99
+  },
+  {
+    "date": "2019-01-01",
+    "event_type": "login",
+    "user": "alice",
+    "value": 8
+  },
+  {
+    "date": "2019-01-01",
+    "event_type": "click",
+    "user": "alice",
+    "value": 11
+  },
+  {
+    "date": "2019-01-01",
+    "event_type": "click",
+    "user": "bob",
+    "value": 52
+  },
+  {
+    "date": "2019-01-02",
+    "event_type": "purchase",
+    "user": "diana",
+    "value": 12
+  },
+  {
+    "date": "2019-01-02",
+    "event_type": "click",
+    "user": "charlie",
+    "value": 48
+  },
+  {
+    "date": "2019-01-02",
+    "event_type": "view",
+    "user": "diana",
+    "value": 95
+  },
+  {
+    "date": "2019-01-02",
+    "event_type": "view",
+    "user": "diana",
+    "value": 67
+  },
+  {
+    "date": "2019-01-02",
+    "event_type": "purchase",
+    "user": "eve",
+    "value": 30
+  },
+  {
+    "date": "2019-01-02",
+    "event_type": "login",
+    "user": "charlie",
+    "value": 26
+  },
+  {
+    "date": "2019-01-02",
+    "event_type": "purchase",
+    "user": "charlie",
+    "value": 13
+  },
+  {
+    "date": "2019-01-03",
+    "event_type": "login",
+    "user": "diana",
+    "value": 76
+  },
+  {
+    "date": "2019-01-03",
+    "event_type": "login",
+    "user": "bob",
+    "value": 92
+  },
+  {
+    "date": "2019-01-03",
+    "event_type": "click",
+    "user": "charlie",
+    "value": 10
+  },
+  {
+    "date": "2019-01-03",
+    "event_type": "view",
+    "user": "eve",
+    "value": 97
+  },
+  {
+    "date": "2019-01-03",
+    "event_type": "login",
+    "user": "eve",
+    "value": 93
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "purchase",
+    "user": "charlie",
+    "value": 50
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "view",
+    "user": "diana",
+    "value": 7
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "view",
+    "user": "diana",
+    "value": 54
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "purchase",
+    "user": "eve",
+    "value": 7
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "click",
+    "user": "alice",
+    "value": 23
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "click",
+    "user": "charlie",
+    "value": 37
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "click",
+    "user": "eve",
+    "value": 35
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "login",
+    "user": "alice",
+    "value": 18
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "login",
+    "user": "bob",
+    "value": 79
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "view",
+    "user": "charlie",
+    "value": 11
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "purchase",
+    "user": "eve",
+    "value": 70
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "login",
+    "user": "bob",
+    "value": 39
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "click",
+    "user": "charlie",
+    "value": 11
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "purchase",
+    "user": "charlie",
+    "value": 87
+  },
+  {
+    "date": "2019-01-04",
+    "event_type": "login",
+    "user": "bob",
+    "value": 52
+  },
+  {
+    "date": "2019-01-05",
+    "event_type": "login",
+    "user": "diana",
+    "value": 93
+  },
+  {
+    "date": "2019-01-05",
+    "event_type": "click",
+    "user": "charlie",
+    "value": 75
+  },
+  {
+    "date": "2019-01-05",
+    "event_type": "login",
+    "user": "eve",
+    "value": 69
+  },
+  {
+    "date": "2019-01-05",
+    "event_type": "view",
+    "user": "diana",
+    "value": 98
+  },
+  {
+    "date": "2019-01-05",
+    "event_type": "purchase",
+    "user": "alice",
+    "value": 71
+  },
+  {
+    "date": "2019-01-05",
+    "event_type": "login",
+    "user": "bob",
+    "value": 6
+  },
+  {
+    "date": "2019-01-05",
+    "event_type": "click",
+    "user": "diana",
+    "value": 92
+  },
+  {
+    "date": "2019-01-05",
+    "event_type": "login",
+    "user": "bob",
+    "value": 93
+  },
+  {
+    "date": "2019-01-05",
+    "event_type": "click",
+    "user": "diana",
+    "value": 12
+  },
+  {
+    "date": "2019-01-05",
+    "event_type": "purchase",
+    "user": "bob",
+    "value": 42
+  },
+  {
+    "date": "2019-01-05",
+    "event_type": "purchase",
+    "user": "diana",
+    "value": 78
+  },
+  {
+    "date": "2019-01-06",
+    "event_type": "click",
+    "user": "diana",
+    "value": 92
+  },
+  {
+    "date": "2019-01-06",
+    "event_type": "view",
+    "user": "eve",
+    "value": 96
+  },
+  {
+    "date": "2019-01-06",
+    "event_type": "purchase",
+    "user": "alice",
+    "value": 76
+  },
+  {
+    "date": "2019-01-06",
+    "event_type": "click",
+    "user": "alice",
+    "value": 92
+  },
+  {
+    "date": "2019-01-06",
+    "event_type": "login",
+    "user": "bob",
+    "value": 88
+  },
+  {
+    "date": "2019-01-06",
+    "event_type": "purchase",
+    "user": "eve",
+    "value": 23
+  },
+  {
+    "date": "2019-01-07",
+    "event_type": "login",
+    "user": "bob",
+    "value": 72
+  },
+  {
+    "date": "2019-01-07",
+    "event_type": "click",
+    "user": "diana",
+    "value": 74
+  },
+  {
+    "date": "2019-01-07",
+    "event_type": "login",
+    "user": "bob",
+    "value": 19
+  },
+  {
+    "date": "2019-01-07",
+    "event_type": "click",
+    "user": "alice",
+    "value": 21
+  },
+  {
+    "date": "2019-01-07",
+    "event_type": "view",
+    "user": "alice",
+    "value": 100
+  },
+  {
+    "date": "2019-01-07",
+    "event_type": "login",
+    "user": "charlie",
+    "value": 38
+  },
+  {
+    "date": "2019-01-07",
+    "event_type": "purchase",
+    "user": "diana",
+    "value": 61
+  },
+  {
+    "date": "2019-01-07",
+    "event_type": "view",
+    "user": "charlie",
+    "value": 90
+  },
+  {
+    "date": "2019-01-07",
+    "event_type": "click",
+    "user": "eve",
+    "value": 95
+  },
+  {
+    "date": "2019-01-07",
+    "event_type": "purchase",
+    "user": "eve",
+    "value": 42
+  },
+  {
+    "date": "2019-01-07",
+    "event_type": "login",
+    "user": "eve",
+    "value": 9
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "login",
+    "user": "bob",
+    "value": 75
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "purchase",
+    "user": "diana",
+    "value": 31
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "view",
+    "user": "charlie",
+    "value": 37
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "view",
+    "user": "charlie",
+    "value": 36
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "click",
+    "user": "eve",
+    "value": 97
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "login",
+    "user": "bob",
+    "value": 15
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "view",
+    "user": "eve",
+    "value": 57
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "click",
+    "user": "alice",
+    "value": 13
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "purchase",
+    "user": "charlie",
+    "value": 74
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "click",
+    "user": "charlie",
+    "value": 98
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "view",
+    "user": "charlie",
+    "value": 75
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "click",
+    "user": "diana",
+    "value": 58
+  },
+  {
+    "date": "2019-01-08",
+    "event_type": "click",
+    "user": "eve",
+    "value": 83
+  },
+  {
+    "date": "2019-01-09",
+    "event_type": "purchase",
+    "user": "bob",
+    "value": 21
+  },
+  {
+    "date": "2019-01-09",
+    "event_type": "click",
+    "user": "bob",
+    "value": 37
+  },
+  {
+    "date": "2019-01-09",
+    "event_type": "view",
+    "user": "alice",
+    "value": 10
+  },
+  {
+    "date": "2019-01-09",
+    "event_type": "purchase",
+    "user": "bob",
+    "value": 61
+  },
+  {
+    "date": "2019-01-09",
+    "event_type": "click",
+    "user": "diana",
+    "value": 68
+  },
+  {
+    "date": "2019-01-09",
+    "event_type": "purchase",
+    "user": "eve",
+    "value": 37
+  },
+  {
+    "date": "2019-01-09",
+    "event_type": "login",
+    "user": "bob",
+    "value": 45
+  },
+  {
+    "date": "2019-01-09",
+    "event_type": "view",
+    "user": "charlie",
+    "value": 91
+  },
+  {
+    "date": "2019-01-09",
+    "event_type": "click",
+    "user": "alice",
+    "value": 8
+  },
+  {
+    "date": "2019-01-09",
+    "event_type": "click",
+    "user": "eve",
+    "value": 29
+  },
+  {
+    "date": "2019-01-10",
+    "event_type": "view",
+    "user": "bob",
+    "value": 56
+  },
+  {
+    "date": "2019-01-10",
+    "event_type": "click",
+    "user": "alice",
+    "value": 75
+  },
+  {
+    "date": "2019-01-10",
+    "event_type": "click",
+    "user": "charlie",
+    "value": 22
+  },
+  {
+    "date": "2019-01-10",
+    "event_type": "login",
+    "user": "diana",
+    "value": 22
+  },
+  {
+    "date": "2019-01-10",
+    "event_type": "click",
+    "user": "eve",
+    "value": 90
+  },
+  {
+    "date": "2019-01-10",
+    "event_type": "click",
+    "user": "eve",
+    "value": 23
+  }
+]

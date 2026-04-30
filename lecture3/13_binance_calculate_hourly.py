@@ -1,121 +1,125 @@
 """
-Binance Price Aggregator - Hourly Average
-==========================================
+Binance Price Aggregator - Hourly Average (Airflow 3 Compatible)
+=================================================================
 
-This DAG calculates hourly average Bitcoin price from the minute-level data
-collected by the binance_fetch_minute DAG.
+Calculates hourly average Bitcoin price from minute-level data
+produced by the binance_fetch_minute DAG.
 
-Schedule: Runs every hour
-Reads: /data/binance/raw/{date}/daily_raw.csv
-Writes: /data/binance/hourly/{date}/hourly_avg.csv
+Reads:
+~/airflow/data/binance/raw/YYYY-MM-DD/daily_raw.csv
+
+Writes:
+~/airflow/data/binance/hourly/YYYY-MM-DD/hourly_avg.csv
 """
 
 from datetime import datetime, timedelta
 from pathlib import Path
+import os
 
 import pandas as pd
 from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.providers.standard.operators.python import PythonOperator
 
 
-def _calculate_hourly_average(**context):
+def calculate_hourly_average(**context):
     """
     Calculates hourly average price from minute-level data.
-    Reads the daily raw CSV file and aggregates by hour.
+    Aggregates the PREVIOUS hour using Airflow logical time.
     """
-    # Get current date and previous hour
-    now = datetime.now()
-    current_date = now.strftime('%Y-%m-%d')
-    current_hour = now.strftime('%H')
-    
-    # Path to raw data
-    raw_file = Path(f"/data/binance/raw/{current_date}/daily_raw.csv")
-    
+
+    # Use Airflow logical execution time
+    logical_time = context["logical_date"]
+
+    # We aggregate the previous completed hour
+    target_time = logical_time - timedelta(hours=1)
+
+    target_date = target_time.strftime("%Y-%m-%d")
+    target_hour = target_time.strftime("%H")
+
+    # Define raw data path
+    airflow_home = Path(
+        os.environ.get("AIRFLOW_HOME", "~/airflow")
+    ).expanduser()
+
+    raw_file = airflow_home / "data" / "binance" / "raw" / target_date / "daily_raw.csv"
+
     if not raw_file.exists():
-        print(f"No raw data file found at {raw_file}")
-        print("Waiting for minute-level data to be collected...")
+        print(f"⚠ No raw data found at {raw_file}")
         return
-    
+
     try:
-        # Read raw data
         df = pd.read_csv(raw_file)
-        
-        # Convert timestamp to datetime
-        df['fetch_time'] = pd.to_datetime(df['fetch_time'])
-        
-        # Extract hour from timestamp
-        df['hour'] = df['fetch_time'].dt.strftime('%H')
-        
-        # Filter for current hour
-        current_hour_data = df[df['hour'] == current_hour].copy()
-        
-        if current_hour_data.empty:
-            print(f"No data found for hour {current_hour}")
+
+        df["fetch_time"] = pd.to_datetime(df["fetch_time"])
+        df["hour"] = df["fetch_time"].dt.strftime("%H")
+
+        # Filter for target hour
+        hour_data = df[df["hour"] == target_hour].copy()
+
+        if hour_data.empty:
+            print(f"⚠ No data found for hour {target_hour}")
             return
-        
-        # Calculate statistics for the hour
+
+        # Calculate statistics
         hourly_stats = {
-            'date': current_date,
-            'hour': current_hour,
-            'avg_price': current_hour_data['price_float'].mean(),
-            'min_price': current_hour_data['price_float'].min(),
-            'max_price': current_hour_data['price_float'].max(),
-            'first_price': current_hour_data['price_float'].iloc[0],
-            'last_price': current_hour_data['price_float'].iloc[-1],
-            'data_points': len(current_hour_data),
-            'calculated_at': now.strftime('%Y-%m-%d %H:%M:%S'),
+            "date": target_date,
+            "hour": target_hour,
+            "avg_price": hour_data["price_float"].mean(),
+            "min_price": hour_data["price_float"].min(),
+            "max_price": hour_data["price_float"].max(),
+            "first_price": hour_data["price_float"].iloc[0],
+            "last_price": hour_data["price_float"].iloc[-1],
+            "data_points": len(hour_data),
+            "calculated_at": logical_time.strftime("%Y-%m-%d %H:%M:%S"),
         }
-        
-        # Create DataFrame
+
         hourly_df = pd.DataFrame([hourly_stats])
-        
-        # Save to CSV
-        output_dir = Path(f"/data/binance/hourly/{current_date}")
+
+        # Output directory
+        output_dir = airflow_home / "data" / "binance" / "hourly" / target_date
         output_dir.mkdir(parents=True, exist_ok=True)
-        
+
         output_file = output_dir / "hourly_avg.csv"
-        
-        # Append if file exists
+
+        # Append while preventing duplicate hour
         if output_file.exists():
             existing_df = pd.read_csv(output_file)
-            # Remove duplicate hour if exists
-            existing_df = existing_df[existing_df['hour'] != current_hour]
+            existing_df = existing_df[existing_df["hour"] != target_hour]
             hourly_df = pd.concat([existing_df, hourly_df], ignore_index=True)
-        
+
         hourly_df.to_csv(output_file, index=False)
-        
-        print(f"Hourly average calculated for {current_date} hour {current_hour}:")
-        print(f"  Average Price: ${hourly_stats['avg_price']:.2f}")
-        print(f"  Min Price: ${hourly_stats['min_price']:.2f}")
-        print(f"  Max Price: ${hourly_stats['max_price']:.2f}")
-        print(f"  Data Points: {hourly_stats['data_points']}")
-        print(f"  Saved to: {output_file}")
-        
+
+        print(f"✅ Hourly aggregation completed")
+        print(f"Date: {target_date} Hour: {target_hour}")
+        print(f"Average Price: ${hourly_stats['avg_price']:.2f}")
+        print(f"Data Points: {hourly_stats['data_points']}")
+        print(f"Saved to: {output_file}")
+
         return hourly_stats
-        
+
     except Exception as e:
-        print(f"Error calculating hourly average: {e}")
+        print(f"❌ Error calculating hourly average: {e}")
         raise
 
 
-# DAG Definition
+# DAG Definition (Airflow 3)
 dag = DAG(
     dag_id="binance_calculate_hourly",
     description="Calculates hourly average Bitcoin price from minute data",
-    schedule=timedelta(hours=1),  # Run every hour
+    schedule=timedelta(hours=1),
     start_date=datetime(2024, 1, 1),
     catchup=False,
-    tags=["binance", "crypto", "price", "hourly", "aggregation"],
+    tags=["binance", "crypto", "hourly", "aggregation"],
     default_args={
-        'retries': 2,
-        'retry_delay': timedelta(minutes=5),
+        "retries": 2,
+        "retry_delay": timedelta(minutes=5),
     },
 )
 
-# Task: Calculate hourly average
+
 calculate_hourly = PythonOperator(
     task_id="calculate_hourly_average",
-    python_callable=_calculate_hourly_average,
+    python_callable=calculate_hourly_average,
     dag=dag,
 )
 
