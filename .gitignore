@@ -1,3 +1,4 @@
 data-pipelines-with-apache-airflow/
 lecture7/assignment
-lecture8/assignment
+lecture8/assignmentlecture8/assignment/docker/.terraform/
+lecture8/assignment/docker/.terraform.lock.hcl
