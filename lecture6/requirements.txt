@@ -1,0 +1,10 @@
+pandas
+numpy
+scikit-learn
+yfinance
+feedparser
+requests
+beautifulsoup4
+joblib
+vaderSentiment
+python-dotenv
