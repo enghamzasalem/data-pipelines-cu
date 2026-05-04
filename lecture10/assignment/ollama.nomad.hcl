@@ -25,9 +25,11 @@ job "ollama" {
       }
 
       config {
-        image = "ollama/ollama:latest"
-        ports = ["ollama"]
-      }
+  image = "ollama/ollama:latest"
+  ports = ["ollama"]
+  
+  
+}
 
       # Lower CPU helps single-node dev agents; raise for production / larger models.
       resources {
@@ -37,7 +39,7 @@ job "ollama" {
     }
 
     task "pull-model" {
-      driver = "exec"
+      driver = "raw_exec"
 
       lifecycle {
         hook    = "poststart"
@@ -50,14 +52,12 @@ job "ollama" {
       }
 
       template {
-        data = <<EOH
-{{ range nomadService "ollama-backend" }}
-OLLAMA_BASE_URL=http://{{ .Address }}:{{ .Port }}
-{{ end }}
+  data = <<EOH
+OLLAMA_BASE_URL=http://127.0.0.1:11434
 EOH
-        destination = "secrets/env.env"
-        env         = true
-      }
+  destination = "secrets/env.env"
+  env         = true
+}
 
       config {
         command = "/bin/bash"

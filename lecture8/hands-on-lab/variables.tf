@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "project" {
   description = "Project name (used in resource naming)"
   type        = string
-  default     = "data-pipeline"
+  default = "data-pipeline-tlaytmass-2026"
 }
 
 variable "env" {
