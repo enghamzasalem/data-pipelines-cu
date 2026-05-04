@@ -27,8 +27,7 @@ except ImportError:
     from airflow.providers.standard.operators.python import PythonOperator
 
 PAGENAMES = {"Google", "Amazon", "Apple", "Microsoft", "Facebook"}
-OUTPUT_DIR = "/data/stocksense/pageview_counts"
-
+OUTPUT_DIR = "/Users/tlaytmass/stocksense/pageview_counts"
 
 def _get_data(year, month, day, hour, output_path, **_):
     """Download Wikipedia pageviews for the given hour (templated op_kwargs)."""
@@ -72,7 +71,40 @@ def _fetch_pageviews(pagenames, execution_date, **context):
 
 
 def _add_to_db(**context):
-    """Add pageview counts to database. Implement this task."""
+    """Add pageview counts to database."""
+    import sqlite3
+    import csv
+    from pathlib import Path
+
+    csv_file = context["templates_dict"]["output_path"]
+    
+    Path(csv_file).parent.mkdir(parents=True, exist_ok=True)
+
+    db_file = "/data/stocksense/pageviews.db"
+
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS pageviews (
+            pagename TEXT,
+            pageviewcount INTEGER,
+            datetime TEXT
+        )
+    """)
+
+    with open(csv_file, "r") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            cursor.execute(
+                "INSERT INTO pageviews VALUES (?, ?, ?)",
+                (row["pagename"], row["pageviewcount"], row["datetime"])
+            )
+
+    conn.commit()
+    conn.close()
+
+    print("Data successfully added to the database.")
     pass
 
 
