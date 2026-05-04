@@ -1,0 +1,18 @@
+Lecture 11 Airflow DAG test proof
+
+DAG: weather_unstructured_to_structured
+Run ID: manual__2026-05-04T15:50:00+00:00
+Execution date: 2026-05-04T15:50:00+00:00
+Final state: success
+
+Successful tasks:
+- fetch_open_meteo_raw
+- ollama_to_structured
+- validate_and_emit
+
+Airflow log excerpt:
+[2026-05-04T15:33:51.291+0200] Marking task as SUCCESS. dag_id=weather_unstructured_to_structured, task_id=validate_and_emit, run_id=manual__2026-05-04T15:50:00+00:00
+[2026-05-04T15:33:51.294+0200] DagRun Finished: dag_id=weather_unstructured_to_structured, execution_date=2026-05-04 15:50:00+00:00, run_id=manual__2026-05-04T15:50:00+00:00, state=success
+
+Structured JSON:
+{"city_label": "Paris", "conditions_short": "Weather code 61, wind 3.8 km/h, humidity 73%.", "observation_date": "2026-05-04", "precipitation_mm": 4.9, "temp_c_current": 17.0, "temp_c_max": 17.8, "temp_c_min": 14.5}

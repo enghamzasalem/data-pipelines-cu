@@ -56,17 +56,47 @@ def weather_ollama_pipeline():
         Ask Ollama to emit ONE JSON object with a fixed schema.
         Set WEATHER_PIPELINES_MOCK_OLLAMA=1 to skip the HTTP call (tests / no GPU).
         """
+        raw_weather = json.loads(raw_json_text)
+
+        def build_contract(model_obj=None) -> dict:
+            model_obj = model_obj or {}
+            current = raw_weather.get("current", {})
+            daily = raw_weather.get("daily", {})
+            daily_dates = daily.get("time") or []
+            max_values = daily.get("temperature_2m_max") or []
+            min_values = daily.get("temperature_2m_min") or []
+            precipitation_values = daily.get("precipitation_sum") or []
+
+            conditions = model_obj.get("conditions_short") or model_obj.get("condition_short")
+            if not conditions:
+                weather_code = current.get("weather_code")
+                wind_speed = current.get("wind_speed_10m")
+                humidity = current.get("relative_humidity_2m")
+                conditions = (
+                    f"Weather code {weather_code}, wind {wind_speed} km/h, "
+                    f"humidity {humidity}%."
+                )
+
+            return {
+                "city_label": "Paris",
+                "observation_date": daily_dates[0]
+                if daily_dates
+                else model_obj.get("observation_date", pendulum.now("UTC").to_date_string()),
+                "temp_c_current": current.get("temperature_2m"),
+                "temp_c_max": max_values[0] if max_values else None,
+                "temp_c_min": min_values[0] if min_values else None,
+                "conditions_short": str(conditions)[:160],
+                "precipitation_mm": precipitation_values[0] if precipitation_values else None,
+            }
+
         if os.environ.get("WEATHER_PIPELINES_MOCK_OLLAMA") == "1":
             return json.dumps(
-                {
-                    "city_label": "Paris (mock)",
-                    "observation_date": "2024-01-15",
-                    "temp_c_current": 12.0,
-                    "temp_c_max": 14.0,
-                    "temp_c_min": 8.0,
-                    "conditions_short": "Mock: enable Ollama for real output.",
-                    "precipitation_mm": 0.1,
-                }
+                build_contract(
+                    {
+                        "city_label": "Paris (mock)",
+                        "conditions_short": "Mock: enable Ollama for real output.",
+                    }
+                )
             )
 
         import requests
@@ -105,9 +135,10 @@ RAW INPUT:
         if not content:
             raise RuntimeError(f"Unexpected Ollama response: {payload!r}")
         if isinstance(content, dict):
-            return json.dumps(content)
-        json.loads(content)
-        return content
+            model_obj = content
+        else:
+            model_obj = json.loads(content)
+        return json.dumps(build_contract(model_obj), sort_keys=True)
 
     @task
     def validate_and_emit(structured_json: str) -> dict:
